@@ -1,4 +1,9 @@
 {
   "apiKey": "",
-  "serverKey": 9999 
+
+    "servers": {
+        "myserver": {
+            "limitedLife": false
+        }
+    }
 }
