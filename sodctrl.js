@@ -3,7 +3,7 @@
 var config   = require(__dirname + '/config')
 var profiles = require(__dirname + '/profiles')
 
-var gandi = require(__dirname + '/gandi');
+var gandi = require(__dirname + '/controllers/gandi');
 var tasks = require(__dirname + '/tasks')
 
 var argv = process.argv.slice(2)
