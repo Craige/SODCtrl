@@ -39,7 +39,7 @@ program.command('shutdown')
         abbr: 'p',
         help: 'Proflie name to shutdown'
     })
-    .callback(function(options) {throw 'Not implemented'})
+    .callback(function(options) {tasks.shutdown(options);})
     .help('Shutdown server(s)')
 
 program.command('execute')

@@ -15,16 +15,22 @@ exports.getProfiles = function () {
 }
 
 exports.boot = function (options) {
+    var self = this
     servers = this.createServerList(options)
     for (i = 0; i < servers.length; i++) {
-        this.getController().bootByName(servers[i])
+        this.getController().getServerId(servers[i], function (serverId) {
+            self.getController().boot(serverId)
+        })
     }
 }
 
-exports.shutdown = function (program) {
+exports.shutdown = function (options) {
+    var self = this
     servers = this.createServerList(options)
     for (i = 0; i < servers.length; i++) {
-        this.getController().shutdownByName(servers[i])
+        this.getController().getServerId(servers[i], function (serverId) {
+            self.getController().shutdown(serverId)
+        })
     }
 }
 

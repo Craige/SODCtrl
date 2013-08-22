@@ -96,16 +96,17 @@ Gandi.prototype = {
 
     boot : function (serverId) {
 
+        var self = this
         this.getServerInfo(serverId, function (server) {
             if (server.state != 'running') {
                 console.log('Starting server...')
 
-                // this.api.methodCall('hosting.vm.start', [this.apiKey, server.id], function (error, value) {
-                //     if(error != null) {
-                //         console.log(error);
-                //         return;
-                //     }
-                // });
+                self.api.methodCall('hosting.vm.start', [self.apiKey, server.id], function (error, value) {
+                    if(error != null) {
+                        console.log(error);
+                        return;
+                    }
+                });
             } else {
                 console.log('Server already running.')
             }
@@ -117,18 +118,18 @@ Gandi.prototype = {
 
             // If no connections have been made for 30 minutes, server will shut down
             // ping back every 5 minutes
-            setInterval(this.pingBack, 5*60*1000, [server]);
+            // setInterval(this.pingBack, 5*60*1000, [server]);
 
         })
     },
 
     shutdown : function (serverId) {
-        // this.api.methodCall('hosting.vm.stop', [this.apiKey, serverId], function (error, value) {
-        //     if(error != null) {
-        //         console.log(error);
-        //         return;
-        //     }
-        // });
+        this.api.methodCall('hosting.vm.stop', [this.apiKey, serverId], function (error, value) {
+            if(error != null) {
+                console.log(error);
+                return;
+            }
+        });
     },
 
     // TODO
