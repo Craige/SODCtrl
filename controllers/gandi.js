@@ -87,13 +87,6 @@ Gandi.prototype = {
         })
     },
 
-    bootByName : function (serverName) {
-        var self = this
-        this.getServerId(serverName, function (serverId) {
-            self.boot(serverId)
-        })
-    },
-
     boot : function (serverId) {
 
         var self = this
