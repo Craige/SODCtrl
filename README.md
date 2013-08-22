@@ -1,7 +1,7 @@
 SODCtrl
 =========
 
-Server-On-Demand Controller is a tool to boot/control on-demand server instances such as Gandi or Amazon AWS
+Server-On-Demand Controller is a tool to control on-demand server instances such as Gandi or Amazon EC2
 
 Usage
 ======
@@ -19,7 +19,10 @@ Alternatively, you may create profiles in `./profiles.json' to act on multiple s
             "servers": ["web01", "db01"]
         },
         "stage": {
-            "servers": ["web01", "db01"]
+            "servers": ["web02", "db02"]
+        },
+        "prod": {
+            "servers": ["web03", "db03"]
         }
     }
 
@@ -33,3 +36,4 @@ Todo
 =====
 - Create "use" task which will be boot server on init, and shutdown server on task completion
 - Create Amazon EC2 controller
+- Create Linode controller
