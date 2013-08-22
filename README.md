@@ -28,3 +28,8 @@ These may be referenced with the -p flag:
 `$ sodctrl boot -p beta`
 
 `$ sodctrl shutdown -p beta`
+
+Todo
+=====
+- Create "use" task which will be boot server on init, and shutdown server on task completion
+- Create Amazon EC2 controller
