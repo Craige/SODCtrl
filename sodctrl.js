@@ -8,15 +8,14 @@ var profiles = require(__dirname + '/profiles')
 var gandi = require(__dirname + '/controllers/gandi');
 var tasks = require(__dirname + '/tasks')
 
+// process.on('SIGINT', function() {
+//     console.log('Caught interrupt. Shutting down now.');
+// });
 
-var argv = process.argv.slice(2)
+var controller = new gandi(config.apiKey)
+    controller.init()
 
-process.on('SIGINT', function() {
-    console.log('Caught interrupt. Shutting down now.');
-});
-
-var g = new gandi(config.apiKey)
-tasks.setController(g)
+tasks.setController(controller)
 tasks.setProfiles(profiles)
 
 program.command('boot')
@@ -28,19 +27,35 @@ program.command('boot')
         abbr: 'p',
         help: 'Proflie name to boot'
     })
-    .callback(function(options) {var self=this; tasks.boot(options);})
+    .callback(function(options) {tasks.boot(options);})
     .help('Boot server(s)')
 
 program.command('shutdown')
     .option('server', {
         abbr: 's',
-        help: 'Server name to boot'
+        help: 'Server name to shutdown'
     })
     .option('profile', {
         abbr: 'p',
-        help: 'Proflie name to boot'
+        help: 'Proflie name to shutdown'
     })
-    .callback(function(options) {var self=this; tasks.shutdown(options);})
+    .callback(function(options) {throw 'Not implemented'})
     .help('Shutdown server(s)')
+
+program.command('execute')
+    .option('server', {
+        abbr: 's',
+        help: 'Server execute command on'
+    })
+    .option('profile', {
+        abbr: 'p',
+        help: 'Proflie execute command on'
+    })
+    .option('command', {
+        abbr: 'c',
+        help: 'Proflie execute command on'
+    })
+    .callback(function(options) {throw 'Not implemented'})
+    .help('Execute a command on a server or profile')
 
 program.parse()

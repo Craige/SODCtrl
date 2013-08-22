@@ -7,12 +7,21 @@ function Gandi(apiKey) {
         port: '443',
         path: '/xmlrpc/'
     })
+    this.serverList = null
+    this.activeQuery = false
 }
 
 Gandi.prototype = {
-    startupByName : function (serverName) {
+
+    init : function () {
+
+        // this.queryServerList()
+    },
+
+    queryServerList : function (fn) {
+        this.activeQuery = true
         var self = this
-        console.log("Looking up server " + serverName);
+        var callback = fn
         this.api.methodCall('hosting.vm.list', [this.apiKey], function (error, value) {
 
             if(error != null) {
@@ -21,67 +30,90 @@ Gandi.prototype = {
                 return;
             }
 
+            servers = [] 
             for (i = 0; i < value.length; i++) {
-                if (value[i].hostname == serverName) {
+                servers[i] = {
+                    id       : value[i].id,
+                    hostname : value[i].hostname
+                }
+            }
+            self.setServerList(servers);
+            this.activeQuery = false
+
+            callback(servers)
+        });
+
+    },
+
+    setServerList : function (servers) {
+        this.serverList = servers
+    },
+
+    getServerList : function (fn) {
+        if (this.serverList == null) {
+            this.queryServerList(fn)
+        } else {
+            callback(this.serverList)
+        }
+    },
+
+    getServerId : function (serverName, fn) {
+        console.log("Looking up server " + serverName);
+        var callback = fn
+
+        this.getServerList(function (servers) {
+            for (i = 0; i < servers.length; i++) {
+                if (servers[i].hostname == serverName) {
                     console.log('Found it!')
-                    self.startup(value[i].id)
+                    callback(servers[i].id);
                     return
                 }
             }
+
             throw "Servername not found"
-        });
-
+        })
     },
 
-    startup : function (serverKey) {
+    getServerInfo : function (serverId) {
+        servers = this.getServerList()
+        for (i = 0; i < servers.length; i++) {
+            if (servers[i].id == serverId) {
+                return servers[i].id
+            }
+        }
+    },
+
+    bootByName : function (serverName) {
         var self = this
-        console.log('Checking for VM with id ' + serverKey + '...');
-        this.api.methodCall('hosting.vm.list', [this.apiKey], function (error, value) {
-
-            if (error != null) {
-                console.log(error)
-                throw error
-                return;
-            }
-
-            for (i = 0; i < value.length; i++) {
-                if (value[i].id == serverKey) {
-                    console.log('Found it!')
-                    self.bootVM(value[i])
-                    return
-                }
-            }
-        });
+        this.getServerId(serverName, function (serverId) {
+            self.boot(serverId)
+        })
     },
 
-    bootVM : function (server) {
+    boot : function (server) {
 
         if (server.state != 'running') {
-            this.boot(server.id);
-        } else {
-            console.log('Server already running.')
-        }
-
-        console.log('Adding connection to ping-back pool');
-
-        // initial ping back
-        setTimeout(this.pingBack, 30000, [server]);
-
-        // If no connections have been made for 30 minutes, server will shut down
-        // ping back every 5 minutes
-        setInterval(this.pingBack, 5*60*1000, [server]);
-
-    },
-
-    boot : function (serverKey) {
         console.log('Starting server...')
 
-        // this.api.methodCall('hosting.vm.start', [this.apiKey, serverKey], function (error, value) {
+        // this.api.methodCall('hosting.vm.start', [this.apiKey, server.id], function (error, value) {
         //     if(error != null) {
         //         console.log(error);
         //         return;
         //     }
         // });
+        } else {
+            console.log('Server already running.')
+        }
+
+        // console.log('Adding connection to ping-back pool');
+
+        // initial ping back
+        // setTimeout(this.pingBack, 30000, [server]);
+
+        // If no connections have been made for 30 minutes, server will shut down
+        // ping back every 5 minutes
+        setInterval(this.pingBack, 5*60*1000, [server]);
+
     },
 
     shutdown : function (serverkey) {
