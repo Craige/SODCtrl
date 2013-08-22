@@ -53,7 +53,7 @@ Gandi.prototype = {
         if (this.serverList == null) {
             this.queryServerList(fn)
         } else {
-            callback(this.serverList)
+            fn(this.serverList)
         }
     },
 
@@ -74,13 +74,17 @@ Gandi.prototype = {
         })
     },
 
-    getServerInfo : function (serverId) {
-        servers = this.getServerList()
-        for (i = 0; i < servers.length; i++) {
-            if (servers[i].id == serverId) {
-                return servers[i].id
+    getServerInfo : function (serverId, fn) {
+        var callback = fn
+
+        this.getServerList(function(servers) {
+            for (i = 0; i < servers.length; i++) {
+                if (servers[i].id == serverId) {
+                    callback(servers[i])
+                    return
+                }
             }
-        }
+        })
     },
 
     bootByName : function (serverName) {
@@ -90,34 +94,40 @@ Gandi.prototype = {
         })
     },
 
-    boot : function (server) {
+    boot : function (serverId) {
 
-        if (server.state != 'running') {
-        console.log('Starting server...')
+        this.getServerInfo(serverId, function (server) {
+            if (server.state != 'running') {
+                console.log('Starting server...')
 
-        // this.api.methodCall('hosting.vm.start', [this.apiKey, server.id], function (error, value) {
+                // this.api.methodCall('hosting.vm.start', [this.apiKey, server.id], function (error, value) {
+                //     if(error != null) {
+                //         console.log(error);
+                //         return;
+                //     }
+                // });
+            } else {
+                console.log('Server already running.')
+            }
+
+            // console.log('Adding connection to ping-back pool');
+
+            // initial ping back
+            // setTimeout(this.pingBack, 30000, [server]);
+
+            // If no connections have been made for 30 minutes, server will shut down
+            // ping back every 5 minutes
+            setInterval(this.pingBack, 5*60*1000, [server]);
+
+        })
+    },
+
+    shutdown : function (serverId) {
+        // this.api.methodCall('hosting.vm.stop', [this.apiKey, serverId], function (error, value) {
         //     if(error != null) {
         //         console.log(error);
         //         return;
         //     }
-        // });
-        } else {
-            console.log('Server already running.')
-        }
-
-        // console.log('Adding connection to ping-back pool');
-
-        // initial ping back
-        // setTimeout(this.pingBack, 30000, [server]);
-
-        // If no connections have been made for 30 minutes, server will shut down
-        // ping back every 5 minutes
-        setInterval(this.pingBack, 5*60*1000, [server]);
-
-    },
-
-    shutdown : function (serverkey) {
-        // this.api.methodCall('hosting.vm.stop', [this.apiKey, serverKey], function (error, value) {
         // });
     },
 
